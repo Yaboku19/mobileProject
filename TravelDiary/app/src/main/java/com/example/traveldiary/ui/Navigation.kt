@@ -17,6 +17,7 @@ import com.example.traveldiary.ui.screens.signin.AddUserScreen
 import com.example.traveldiary.ui.screens.signin.AddTravelViewModel
 import com.example.traveldiary.ui.screens.login.LoginViewModel
 import com.example.traveldiary.ui.screens.homeMap.HomeMapScreen
+import com.example.traveldiary.ui.screens.homeMarks.HomeMarksScreen
 import com.example.traveldiary.ui.screens.login.HomeScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -36,12 +37,9 @@ sealed class TravelDiaryRoute(
     }
 
     data object HomeMarks : TravelDiaryRoute(
-        "home/mark/{userUsername}",
+        "home/mark/",
         "marks",
-        listOf(navArgument("userUsername") {type = NavType.StringType})
-    )  {
-        fun buildRoute(userUsername: String) = "home/mark/$userUsername"
-    }
+    )
 
     data object HomeAddMark : TravelDiaryRoute(
         "home/add/{userUsername}/{latitude}/{longitude}",
@@ -141,6 +139,11 @@ fun TravelDiaryNavGraph(
                     actions = addMarkerVm.actions,
                     onSubmit = {markersVm.addMarker(addMarkerState.toMarker())}
                 )
+            }
+        }
+        with(TravelDiaryRoute.HomeMarks) {
+            composable(route) {
+                HomeMarksScreen(navController = navController, state = markersState)
             }
         }
     }
