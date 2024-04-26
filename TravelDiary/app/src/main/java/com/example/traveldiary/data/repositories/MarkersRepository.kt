@@ -11,5 +11,5 @@ class MarkersRepository(private val placesDAO: PlacesDAO) {
 
     suspend fun delete(marker: Marker) = placesDAO.deleteMarker(marker)
 
-    fun getUser(mark: String) = placesDAO.getMarker(mark)
+    fun getMarker(latitude: Float, longitude: Float) = placesDAO.getMarker(latitude, longitude)
 }

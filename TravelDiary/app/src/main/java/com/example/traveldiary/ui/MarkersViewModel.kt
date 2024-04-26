@@ -32,7 +32,7 @@ class MarkersViewModel(
         }
     }
 
-    fun getMarker (marker: Marker) {
+    fun getMarker (latitude: Float, longitude: Float) {
         viewModelScope.launch {
 
         }

@@ -38,6 +38,7 @@ import androidx.navigation.NavHostController
 import com.example.traveldiary.data.database.Marker
 import com.example.traveldiary.ui.MarkersState
 import com.example.traveldiary.ui.TravelDiaryRoute
+import com.example.traveldiary.ui.composables.DropMenu
 
 @Composable
 fun HomeMarksScreen(navController: NavHostController, state : MarkersState) {
@@ -55,7 +56,7 @@ fun HomeMarksScreen(navController: NavHostController, state : MarkersState) {
                     TravelItem(
                         item,
                         onClick = {
-                            //navController.navigate(TravelDiaryRoute.HomeMap.buildRoute(item.id.toString()))
+                            navController.navigate(TravelDiaryRoute.HomeMarkDetail.buildRoute(item.latitude, item.longitude))
                         }
                     )
                 }
@@ -116,7 +117,9 @@ fun NoItemsPlaceholder(modifier: Modifier = Modifier) {
     ) {
         Icon(
             Icons.Outlined.LocationOn, "Location icon",
-            modifier = Modifier.padding(bottom = 16.dp).size(48.dp),
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .size(48.dp),
             tint = MaterialTheme.colorScheme.secondary
         )
         Text(

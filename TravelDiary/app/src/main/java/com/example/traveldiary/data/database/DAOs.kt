@@ -17,8 +17,8 @@ interface PlacesDAO {
     @Query("SELECT * FROM user WHERE username = :user")
     fun getUser(user: String): Flow<User?>
 
-    @Query("SELECT * FROM marker WHERE name = :mark")
-    fun getMarker(mark: String): Flow<Marker?>
+    @Query("SELECT * FROM marker WHERE latitude = :latitude AND longitude = :longitude")
+    fun getMarker(latitude: Float, longitude: Float): Flow<Marker?>
 
     @Upsert
     suspend fun upsertUser(user: User)

@@ -17,6 +17,7 @@ import com.example.traveldiary.ui.screens.signin.AddUserScreen
 import com.example.traveldiary.ui.screens.signin.AddTravelViewModel
 import com.example.traveldiary.ui.screens.login.LoginViewModel
 import com.example.traveldiary.ui.screens.homeMap.HomeMapScreen
+import com.example.traveldiary.ui.screens.homeMarkDetail.HomeMarkDetailScreen
 import com.example.traveldiary.ui.screens.homeMarks.HomeMarksScreen
 import com.example.traveldiary.ui.screens.login.HomeScreen
 import org.koin.androidx.compose.koinViewModel
@@ -54,10 +55,21 @@ sealed class TravelDiaryRoute(
             "home/add/$userUsername/$latitude/$longitude"
     }
 
+    data object HomeMarkDetail : TravelDiaryRoute (
+        "home/mark/detail/{latitude}/{longitude}",
+        "detail",
+        listOf(
+            navArgument("latitude") { type = NavType.FloatType },
+            navArgument("longitude") { type = NavType.FloatType }
+        )
+    ) {
+        fun buildRoute(latitude: Float, longitude: Float) = "home/mark/detail/$latitude/$longitude"
+    }
+
     data object SignIn : TravelDiaryRoute("sign-in", "sign-in")
 
     companion object {
-        val routes = setOf(LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark)
+        val routes = setOf(LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark, HomeMarkDetail)
     }
 }
 
@@ -144,6 +156,18 @@ fun TravelDiaryNavGraph(
         with(TravelDiaryRoute.HomeMarks) {
             composable(route) {
                 HomeMarksScreen(navController = navController, state = markersState)
+            }
+        }
+        with(TravelDiaryRoute.HomeMarkDetail) {
+            composable(route, arguments) {backStackEntry ->
+                val latitude = backStackEntry.arguments?.getFloat("latitude") ?: 0f
+                val longitude = backStackEntry.arguments?.getFloat("longitude") ?: 0f
+
+                val marker = requireNotNull(markersState.markers.find {
+                    it.latitude == latitude && it.longitude == longitude
+                })
+
+                HomeMarkDetailScreen(navController = navController, marker = marker)
             }
         }
     }
