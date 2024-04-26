@@ -57,7 +57,7 @@ fun HomeMarksScreen(navController: NavHostController, state : MarkersState, user
                     TravelItem(
                         item,
                         onClick = {
-                            navController.navigate(TravelDiaryRoute.HomeMarkDetail.buildRoute(item.latitude, item.longitude))
+                            navController.navigate(TravelDiaryRoute.HomeMarkDetail.buildRoute(user.username, item.latitude, item.longitude))
                         }
                     )
                 }

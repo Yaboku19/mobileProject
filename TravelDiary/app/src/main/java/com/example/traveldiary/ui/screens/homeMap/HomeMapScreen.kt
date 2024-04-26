@@ -49,7 +49,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersState) {
+fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersState, latitude : Float, longitude : Float) {
     /*val ctx = LocalContext.current
 
     fun shareDetails() {
@@ -109,7 +109,7 @@ fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersS
             )
         }
     }*/
-    var center by remember { mutableStateOf(LatLng(41.9028, 12.4964)) }  // Coordinate iniziali di Roma
+    var center by remember { mutableStateOf(LatLng(latitude.toDouble(), longitude.toDouble())) }  // Coordinate iniziali di Roma
     var placeLocations by remember { mutableStateOf(listOf<LatLng>()) }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition(center, 10f, 0f, 0f)
@@ -137,7 +137,9 @@ fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersS
                 }, updateMarkerPosition = {
                     markerPosition = it
                 },
-                    state)
+                    state,
+                    navController,
+                    user)
             }
             if (showButton) {
                 FloatingActionButton(
@@ -171,7 +173,9 @@ fun MapView(
     cameraPositionState: CameraPositionState,
     onMarkerClick: () -> Unit,
     updateMarkerPosition: (LatLng?) -> Unit,
-    state : MarkersState
+    state : MarkersState,
+    navController: NavHostController,
+    user : User
 ) {
     var markerPosition by remember { mutableStateOf<LatLng?>(null) }  // Aggiunge lo stato per memorizzare la posizione del marker
 
@@ -201,7 +205,15 @@ fun MapView(
         state.markers.forEach{marker ->
             Marker(
                 state = MarkerState(LatLng(marker.latitude.toDouble(), marker.longitude.toDouble())),
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+                onClick = {
+                    navController.navigate(TravelDiaryRoute.HomeMarkDetail.buildRoute(
+                        user.username,
+                        marker.latitude,
+                        marker.longitude
+                        ))
+                    true
+                }
             )
         }
     }

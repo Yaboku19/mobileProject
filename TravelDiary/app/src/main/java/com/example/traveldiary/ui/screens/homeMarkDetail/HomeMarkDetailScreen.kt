@@ -17,9 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.traveldiary.data.database.Marker
+import com.example.traveldiary.data.database.User
+import com.example.traveldiary.ui.TravelDiaryRoute
 
 @Composable
-fun HomeMarkDetailScreen(navController: NavHostController, marker: Marker) {
+fun HomeMarkDetailScreen(navController: NavHostController, marker: Marker, user: User) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +78,12 @@ fun HomeMarkDetailScreen(navController: NavHostController, marker: Marker) {
                 )
             }
         }
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = { navController.navigate(TravelDiaryRoute.HomeMap.buildRoute(
+                            user.username,
+                            marker.latitude,
+                            marker.longitude
+                            )
+        ) }) {
             Text(text = "Guarda posizione")
         }
     }

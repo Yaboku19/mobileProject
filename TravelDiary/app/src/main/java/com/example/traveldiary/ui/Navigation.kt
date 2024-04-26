@@ -29,11 +29,16 @@ sealed class TravelDiaryRoute(
     data object LogIn : TravelDiaryRoute("log-in", "log-in")
 
     data object HomeMap : TravelDiaryRoute(
-        "home/map/{userUsername}",
+        "home/map/{userUsername}/{latitude}/{longitude}",
         "homePage",
-        listOf(navArgument("userUsername") { type = NavType.StringType })
+        listOf(
+            navArgument("userUsername") { type = NavType.StringType },
+            navArgument("latitude") { type = NavType.FloatType },
+            navArgument("longitude") { type = NavType.FloatType }
+        )
     ) {
-        fun buildRoute(userUsername: String) = "home/map/$userUsername"
+        fun buildRoute(userUsername: String, latitude: Float, longitude: Float)
+            = "home/map/$userUsername/$latitude/$longitude"
     }
 
     data object HomeMarks : TravelDiaryRoute(
@@ -60,14 +65,16 @@ sealed class TravelDiaryRoute(
     }
 
     data object HomeMarkDetail : TravelDiaryRoute (
-        "home/mark/detail/{latitude}/{longitude}",
+        "home/mark/detail/{userUsername}/{latitude}/{longitude}",
         "detail",
         listOf(
+            navArgument("userUsername") { type = NavType.StringType },
             navArgument("latitude") { type = NavType.FloatType },
             navArgument("longitude") { type = NavType.FloatType }
         )
     ) {
-        fun buildRoute(latitude: Float, longitude: Float) = "home/mark/detail/$latitude/$longitude"
+        fun buildRoute(userUsername: String, latitude: Float, longitude: Float) =
+            "home/mark/detail/$userUsername/$latitude/$longitude"
     }
 
     data object SignIn : TravelDiaryRoute("sign-in", "sign-in")
@@ -111,10 +118,12 @@ fun TravelDiaryNavGraph(
         with(TravelDiaryRoute.HomeMap) {
             composable(route, arguments) { backStackEntry ->
                 usersVm.resetValues()
+                val latitude = backStackEntry.arguments?.getFloat("latitude") ?: 0f
+                val longitude = backStackEntry.arguments?.getFloat("longitude") ?: 0f
                 val user = requireNotNull(usersState.users.find {
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
-                HomeMapScreen(user, navController, markersState)
+                HomeMapScreen(user, navController, markersState, latitude, longitude)
             }
         }
         with(TravelDiaryRoute.SignIn) {
@@ -173,8 +182,11 @@ fun TravelDiaryNavGraph(
                 val marker = requireNotNull(markersState.markers.find {
                     it.latitude == latitude && it.longitude == longitude
                 })
+                val user = requireNotNull(usersState.users.find {
+                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                })
 
-                HomeMarkDetailScreen(navController = navController, marker = marker)
+                HomeMarkDetailScreen(navController = navController, marker = marker, user = user)
             }
         }
     }
