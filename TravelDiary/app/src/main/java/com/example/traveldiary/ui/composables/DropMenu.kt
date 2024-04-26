@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,19 +22,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.TravelDiaryRoute
 
 @Composable
 fun DropMenu(user: User, navController: NavHostController) {
     var showMenu by remember { mutableStateOf(false) }
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute by remember {
+        derivedStateOf {
+            TravelDiaryRoute.routes.find {
+                it.route == backStackEntry?.destination?.route
+            } ?: TravelDiaryRoute.LogIn
+        }
+    }
     Box() {
         FloatingActionButton(
             onClick = { showMenu = !showMenu },
             containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 70.dp, start = 16.dp)  // Posizionamento in alto a destra
+                .padding(top = if(currentRoute.title == "homePage") 70.dp else 16.dp, start = 16.dp)  // Posizionamento in alto a destra
         ) {
             Icon(Icons.Filled.Menu, contentDescription = "Menu")
         }
@@ -60,7 +70,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             DropdownMenuItem(
                 onClick = {
                     showMenu = false
-                    navController.navigate(TravelDiaryRoute.HomeMarks.route)
+                    navController.navigate(TravelDiaryRoute.HomeMarks.buildRoute(user.username))
                 },
                 text = { Text("Posizioni") }
             )

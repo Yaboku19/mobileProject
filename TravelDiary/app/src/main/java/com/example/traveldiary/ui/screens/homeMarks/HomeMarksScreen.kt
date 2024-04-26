@@ -36,12 +36,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.traveldiary.data.database.Marker
+import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.MarkersState
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.DropMenu
 
 @Composable
-fun HomeMarksScreen(navController: NavHostController, state : MarkersState) {
+fun HomeMarksScreen(navController: NavHostController, state : MarkersState, user: User) {
     Scaffold(
     ) { contentPadding ->
         if (state.markers.isNotEmpty()) {
@@ -64,6 +65,7 @@ fun HomeMarksScreen(navController: NavHostController, state : MarkersState) {
         } else {
             NoItemsPlaceholder(Modifier.padding(contentPadding))
         }
+        DropMenu(user = user, navController = navController)
     }
 }
 
