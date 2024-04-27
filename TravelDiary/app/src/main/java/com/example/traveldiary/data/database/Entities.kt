@@ -28,6 +28,12 @@ data class Marker (
     var description: String,
 
     @ColumnInfo
+    var city: String,
+
+    @ColumnInfo
+    var province: String,
+
+    @ColumnInfo
     var latitude: Float,
 
     @ColumnInfo

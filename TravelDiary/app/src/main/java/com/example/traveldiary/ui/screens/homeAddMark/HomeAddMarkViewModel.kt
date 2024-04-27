@@ -10,7 +10,9 @@ data class AddMarkerState(
     val name: String = "",
     val description: String = "",
     val latitude: Float = 0f,
-    val longitude: Float = 0f
+    val longitude: Float = 0f,
+    val city : String = "",
+    val province : String = ""
 ) {
     val canSubmit get() = name.isNotBlank() && description.isNotBlank()
 
@@ -18,13 +20,17 @@ data class AddMarkerState(
         name = name,
         description = description,
         latitude = latitude,
-        longitude = longitude
+        longitude = longitude,
+        city = city,
+        province = province
     )
 }
 
 interface AddMarkerActions {
     fun setName(name: String)
     fun setDescription(description: String)
+    fun setCity(city : String)
+    fun setProvince(province: String)
     fun setLatitude(latitude: Float)
     fun setLongitude(longitude: Float)
 }
@@ -39,6 +45,14 @@ class AddMarkerViewModel : ViewModel() {
 
         override fun setDescription(description: String) =
             _state.update { it.copy(description = description) }
+
+        override fun setCity(city: String) {
+            _state.update { it.copy(city = city) }
+        }
+
+        override fun setProvince(province: String) {
+            _state.update { it.copy(province = province) }
+        }
 
         override fun setLatitude(latitude: Float) {
             _state.update { it.copy(latitude = latitude) }
