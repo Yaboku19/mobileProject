@@ -43,7 +43,11 @@ fun DropMenu(user: User, navController: NavHostController) {
             containerColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = if(currentRoute.title == "homePage") 70.dp else 16.dp, start = 16.dp)  // Posizionamento in alto a destra
+                .padding(top =
+                    if(currentRoute.title == "homePage" || currentRoute.title == "marks")
+                        70.dp
+                        else 16.dp,
+                    start = 16.dp)  // Posizionamento in alto a destra
         ) {
             Icon(Icons.Filled.Menu, contentDescription = "Menu")
         }
