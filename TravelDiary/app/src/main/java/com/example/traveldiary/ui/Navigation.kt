@@ -2,7 +2,12 @@ package com.example.traveldiary.ui
 
 import HomeMarkDetailScreen
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NamedNavArgument
@@ -11,6 +16,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.traveldiary.Position
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.HomeAddMarkScreen
 import com.example.traveldiary.ui.screens.login.LogInScreen
@@ -37,8 +43,11 @@ sealed class TravelDiaryRoute(
             navArgument("longitude") { type = NavType.FloatType }
         )
     ) {
-        fun buildRoute(userUsername: String, latitude: Float, longitude: Float)
+        fun buildRoute(userUsername: String, latitude: Float?, longitude: Float?)
             = "home/map/$userUsername/$latitude/$longitude"
+        fun buildWithoutPosition (userUsername: String) = "home/map/$userUsername/0/0"
+
+        fun buildWithoutAnything() = "home/map/null/0/0"
     }
 
     data object HomeMarks : TravelDiaryRoute(
@@ -88,13 +97,20 @@ sealed class TravelDiaryRoute(
 @Composable
 fun TravelDiaryNavGraph(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPosition : () -> Unit,
+    position: Position
 ) {
     val usersVm = koinViewModel<UsersViewModel>()
     val usersState by usersVm.state.collectAsStateWithLifecycle()
 
     val markersVm = koinViewModel<MarkersViewModel>()
     val markersState by markersVm.state.collectAsStateWithLifecycle()
+
+    val defaultLatitude by position.latitude.observeAsState()
+    val defaultLongitude by position.longitude.observeAsState()
+
+    var userDefault by remember{ mutableStateOf("null")}
 
     NavHost(
         navController = navController,
@@ -118,12 +134,23 @@ fun TravelDiaryNavGraph(
         with(TravelDiaryRoute.HomeMap) {
             composable(route, arguments) { backStackEntry ->
                 usersVm.resetValues()
-                val latitude = backStackEntry.arguments?.getFloat("latitude") ?: 0f
-                val longitude = backStackEntry.arguments?.getFloat("longitude") ?: 0f
+                var latitude = backStackEntry.arguments?.getFloat("latitude") ?: defaultLatitude
+                latitude = if(latitude == 0f) defaultLatitude else latitude
+                var longitude = backStackEntry.arguments?.getFloat("longitude") ?: defaultLongitude
+                longitude = if (longitude == 0f) defaultLongitude else longitude
+                var userName =  backStackEntry.arguments?.getString("userUsername") ?: userDefault
+                userName = if (userName == "null") userDefault else userName
+                userDefault = userName
                 val user = requireNotNull(usersState.users.find {
-                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                    it.username == userName
                 })
-                HomeMapScreen(user, navController, markersState, latitude, longitude)
+                HomeMapScreen(
+                    user,
+                    navController,
+                    markersState,
+                    latitude!!,
+                    longitude!!,
+                    onPosition = {onPosition()})
             }
         }
         with(TravelDiaryRoute.SignIn) {
@@ -143,7 +170,6 @@ fun TravelDiaryNavGraph(
         with(TravelDiaryRoute.HomeAddMark) {
             composable(route, arguments) { backStackEntry ->
                 // Estrai i parametri dalla back stack entry
-                val userUsername = backStackEntry.arguments?.getString("userUsername").orEmpty()
                 val latitude = backStackEntry.arguments?.getFloat("latitude") ?: 0f
                 val longitude = backStackEntry.arguments?.getFloat("longitude") ?: 0f
                 val addMarkerVm = koinViewModel<AddMarkerViewModel>()
@@ -188,6 +214,13 @@ fun TravelDiaryNavGraph(
 
                 HomeMarkDetailScreen(navController = navController, marker = marker, user = user)
             }
+        }
+
+    }
+    LaunchedEffect(defaultLatitude, defaultLongitude) {
+        if (defaultLatitude != null && defaultLongitude != null
+            && defaultLatitude != 41.9028f && defaultLongitude != 12.4964f) {
+            navController.navigate(TravelDiaryRoute.HomeMap.buildRoute(userDefault, defaultLatitude, defaultLongitude))
         }
     }
 }

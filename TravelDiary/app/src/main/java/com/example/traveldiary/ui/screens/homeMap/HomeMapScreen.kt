@@ -1,8 +1,12 @@
 package com.example.traveldiary.ui.screens.homeMap
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,11 +31,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import com.example.traveldiary.Position
 import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.MarkersState
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.DropMenu
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -49,7 +57,14 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersState, latitude : Float, longitude : Float) {
+fun HomeMapScreen(
+    user: User,
+    navController: NavHostController,
+    state : MarkersState,
+    latitude : Float,
+    longitude : Float,
+    onPosition : () -> Unit
+) {
     /*val ctx = LocalContext.current
 
     fun shareDetails() {
@@ -160,6 +175,17 @@ fun HomeMapScreen(user: User, navController: NavHostController, state : MarkersS
                     }
                 }
             }
+            FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                onClick = {
+                        onPosition()
+                    },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 16.dp, top = 70.dp)
+            ) {
+                Text(text = "Usa la tua posizione")
+            }
             DropMenu(user = user, navController = navController)
         }
     }
@@ -221,7 +247,7 @@ fun MapView(
 
 
 @Composable
-fun SearchBar(onQueryChanged: (String) -> Unit) {
+private fun SearchBar(onQueryChanged: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
 
     TextField(
@@ -239,7 +265,7 @@ fun SearchBar(onQueryChanged: (String) -> Unit) {
     )
 }
 
-fun performSearch(query: String, context: Context, onResult: (List<LatLng>) -> Unit) {
+private fun performSearch(query: String, context: Context, onResult: (List<LatLng>) -> Unit) {
     if (!Places.isInitialized()) {
         Places.initialize(context, "AIzaSyB6IrzeS3vCCiPHToNAG5u0tZkIyJx1IbM")
     }
@@ -265,7 +291,7 @@ fun performSearch(query: String, context: Context, onResult: (List<LatLng>) -> U
     }
 }
 
-fun fetchPlaceDetails(placeId: String, placesClient: PlacesClient, onResult: (LatLng?) -> Unit) {
+private fun fetchPlaceDetails(placeId: String, placesClient: PlacesClient, onResult: (LatLng?) -> Unit) {
     val placeFields = listOf(Place.Field.LAT_LNG)
     val request = FetchPlaceRequest.newInstance(placeId, placeFields)
 

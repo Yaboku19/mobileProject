@@ -84,7 +84,7 @@ fun LogInScreen(
         if (addUserResult == false) {
             Text(addUserLog.toString(), color = Color.Red)
         } else if (addUserResult == true) {
-            navController.navigate(TravelDiaryRoute.HomeMap.buildRoute(state.username, 41.9028f, 12.4964f))
+            navController.navigate(TravelDiaryRoute.HomeMap.buildWithoutPosition(state.username))
         }
     }
 }

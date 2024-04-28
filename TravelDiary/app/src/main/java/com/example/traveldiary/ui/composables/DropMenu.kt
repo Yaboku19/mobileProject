@@ -66,7 +66,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             DropdownMenuItem(
                 onClick = {
                     showMenu = false
-                    navController.navigate(TravelDiaryRoute.HomeMap.buildRoute(user.username, 41.9028f, 12.4964f))
+                    navController.navigate(TravelDiaryRoute.HomeMap.buildWithoutPosition(user.username))
                 },
                 text = { Text("Mappa") }
             )
