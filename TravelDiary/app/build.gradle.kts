@@ -72,6 +72,7 @@ dependencies {
     implementation ("com.google.android.libraries.places:places:3.4.0")
     implementation ("com.squareup.okhttp3:okhttp:4.12.0")
     implementation ("com.google.code.gson:gson:2.10")
+    implementation ("com.google.android.gms:play-services-location:21.2.0")
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")

@@ -20,6 +20,7 @@ import com.example.traveldiary.ui.composables.AppBar
 import com.example.traveldiary.ui.theme.TravelDiaryTheme
 import com.google.android.libraries.places.api.Places
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
