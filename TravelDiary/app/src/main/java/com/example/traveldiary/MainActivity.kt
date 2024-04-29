@@ -1,31 +1,44 @@
 package com.example.traveldiary
 
 import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.traveldiary.ui.TravelDiaryNavGraph
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.AppBar
 import com.example.traveldiary.ui.theme.TravelDiaryTheme
+import com.example.traveldiary.utils.LocationService
+import com.example.traveldiary.utils.PermissionStatus
+import com.example.traveldiary.utils.StartMonitoringResult
+import com.example.traveldiary.utils.rememberPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
@@ -34,20 +47,29 @@ import com.google.android.libraries.places.api.Places
 class MainActivity : ComponentActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var position = Position(41.9028f, 12.4964f)
+    private lateinit var locationService: LocationService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Places.initialize(applicationContext, "AIzaSyB6IrzeS3vCCiPHToNAG5u0tZkIyJx1IbM")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationService = LocationService(this)
 
-        val requestPermissionLauncher = registerForActivityResult(
+        /*val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
                 getLastLocation()
             } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // Permesso negato una volta, mostrare spiegazione se necessario
+                    Toast.makeText(this, "Location permission is needed to provide functionality", Toast.LENGTH_LONG).show()
+
+                } else {
+                    // Permesso negato definitivamente
+                    Toast.makeText(this, "Permission was denied and cannot be asked again", Toast.LENGTH_LONG).show()
+                }
             }
-        }
+        }*/
 
         setContent {
             TravelDiaryTheme {
@@ -55,6 +77,40 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val snackbarHostState = remember { SnackbarHostState() }
+                    var showLocationDisabledAlert by remember { mutableStateOf(false) }
+                    var showPermissionDeniedAlert by remember { mutableStateOf(false) }
+                    var showPermissionPermanentlyDeniedSnackbar by remember { mutableStateOf(false) }
+
+                    val locationPermission = rememberPermission(
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) { status ->
+                        when (status) {
+                            PermissionStatus.Granted -> {
+                                val res = locationService.requestCurrentLocation()
+                                showLocationDisabledAlert = res == StartMonitoringResult.GPSDisabled
+                            }
+
+                            PermissionStatus.Denied ->
+                                showPermissionDeniedAlert = true
+
+                            PermissionStatus.PermanentlyDenied ->
+                                showPermissionPermanentlyDeniedSnackbar = true
+
+                            PermissionStatus.Unknown -> {}
+                        }
+                    }
+
+                    fun requestLocation() {
+                        if (locationPermission.status.isGranted) {
+                            val res = locationService.requestCurrentLocation()
+                            showLocationDisabledAlert = res == StartMonitoringResult.GPSDisabled
+                        } else {
+                            locationPermission.launchPermissionRequest()
+
+                        }
+                    }
+
                     val navController = rememberNavController()
                     val backStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute by remember {
@@ -65,16 +121,18 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-
                     Scaffold(
-                        topBar = { AppBar(navController, currentRoute) }
+                        topBar = { AppBar(navController, currentRoute) },
+                        snackbarHost = { SnackbarHost(snackbarHostState) },
                     ) { contentPadding ->
+                        position.setLatitude(locationService.coordinates?.latitude?.toFloat() ?: position.latitude.value!!)
+                        position.setLongitude(locationService.coordinates?.longitude?.toFloat() ?: position.longitude.value!!)
                         TravelDiaryNavGraph(
                             navController,
                             modifier =  Modifier.padding(contentPadding),
                             position = position,
                             onPosition = fun() {
-                                when (PackageManager.PERMISSION_GRANTED) {
+                                /*when (PackageManager.PERMISSION_GRANTED) {
                                     ContextCompat.checkSelfPermission(
                                         this, Manifest.permission.ACCESS_FINE_LOCATION
                                     ) -> {
@@ -84,28 +142,118 @@ class MainActivity : ComponentActivity() {
                                     else -> {
                                         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                                     }
-                                }
+                                }*/
+                                requestLocation()
                             }
                         )
+                    }
+                    if (showLocationDisabledAlert) {
+                        AlertDialog(
+                            title = { Text("Location disabled") },
+                            text = { Text("Location must be enabled to get your current location in the app.") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    locationService.openLocationSettings()
+                                    showLocationDisabledAlert = false
+                                }) {
+                                    Text("Enable")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showLocationDisabledAlert = false }) {
+                                    Text("Dismiss")
+                                }
+                            },
+                            onDismissRequest = { showLocationDisabledAlert = false }
+                        )
+                    }
+
+                    if (showPermissionDeniedAlert) {
+                        AlertDialog(
+                            title = { Text("Location permission denied") },
+                            text = { Text("Location permission is required to get your current location in the app.") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    locationPermission.launchPermissionRequest()
+                                    showPermissionDeniedAlert = false
+                                }) {
+                                    Text("Grant")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showPermissionDeniedAlert = false }) {
+                                    Text("Dismiss")
+                                }
+                            },
+                            onDismissRequest = { showPermissionDeniedAlert = false }
+                        )
+                    }
+
+                    val ctx = LocalContext.current
+                    if (showPermissionPermanentlyDeniedSnackbar) {
+                        LaunchedEffect(snackbarHostState) {
+                            val res = snackbarHostState.showSnackbar(
+                                "Location permission is required.",
+                                "Go to Settings",
+                                duration = SnackbarDuration.Long
+                            )
+                            if (res == SnackbarResult.ActionPerformed) {
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", ctx.packageName, null)
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                if (intent.resolveActivity(ctx.packageManager) != null) {
+                                    ctx.startActivity(intent)
+                                }
+                            }
+                            showPermissionPermanentlyDeniedSnackbar = false
+                        }
                     }
                 }
             }
         }
     }
+    override fun onPause() {
+        super.onPause()
+        locationService.pauseLocationRequest()
+    }
 
-    private fun getLastLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    Toast.makeText(this, "Lat: ${location.latitude}, Lng: ${location.longitude}", Toast.LENGTH_LONG).show()
-                    position.setLatitude(location.latitude.toFloat())
-                    position.setLongitude(location.longitude.toFloat())
-                } else {
-                    Toast.makeText(this, "No location found", Toast.LENGTH_LONG).show()
+    override fun onResume() {
+        super.onResume()
+        locationService.resumeLocationRequest()
+    }
+
+    /*private fun getLastLocation() {
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
+                // Permesso già concesso
+                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                    if (location != null) {
+                        position.setLatitude(location.latitude.toFloat())
+                        position.setLongitude(location.longitude.toFloat())
+                    } else {
+                        Toast.makeText(this, "No location found", Toast.LENGTH_LONG).show()
+                    }
                 }
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                // Permesso negato una volta, mostrare spiegazione se necessario
+                // e chiedere nuovamente il permesso
+                Toast.makeText(this, "Location permission is needed to provide functionality", Toast.LENGTH_LONG).show()
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+            }
+            else -> {
+                // Permesso negato definitivamente (utente ha scelto "Don't ask again")
+                Toast.makeText(this, "Permission was denied and cannot be asked again", Toast.LENGTH_LONG).show()
+                // Qui potresti voler spiegare ulteriormente o aprire le impostazioni dell'app
+                // per permettere all'utente di cambiare manualmente i permessi se desidera
             }
         }
     }
+
+    companion object {
+        private const val REQUEST_LOCATION_PERMISSION = 1
+    }*/
 }
 
 class Position (
