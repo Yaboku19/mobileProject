@@ -39,3 +39,12 @@ data class Marker (
     @ColumnInfo
     var longitude: Float
 )
+
+@Entity(primaryKeys = ["userId", "markerId"])
+data class Favorite (
+    @ColumnInfo
+    var userId : Int,
+
+    @ColumnInfo
+    var markerId : Int
+)

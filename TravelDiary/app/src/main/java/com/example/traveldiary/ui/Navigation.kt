@@ -1,6 +1,6 @@
 package com.example.traveldiary.ui
 
-import HomeMarkDetailScreen
+import com.example.traveldiary.ui.screens.homeMarkDetail.HomeMarkDetailScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.traveldiary.Position
+import com.example.traveldiary.data.database.Favorite
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.HomeAddMarkScreen
 import com.example.traveldiary.ui.screens.login.LogInScreen
@@ -60,6 +61,16 @@ sealed class TravelDiaryRoute(
         fun buildRoute(userUsername: String) = "home/mark/$userUsername"
     }
 
+    data object HomeFavorites : TravelDiaryRoute(
+        "home/mark/favorite/{userUsername}",
+        "favorite marks",
+        listOf(
+            navArgument("userUsername") { type = NavType.StringType }
+        )
+    ) {
+        fun buildRoute(userUsername: String) = "home/mark/favorite/$userUsername"
+    }
+
     data object HomeAddMark : TravelDiaryRoute(
         "home/add/{userUsername}/{latitude}/{longitude}",
         "addMark",
@@ -89,7 +100,7 @@ sealed class TravelDiaryRoute(
     data object SignIn : TravelDiaryRoute("sign-in", "sign-in")
 
     companion object {
-        val routes = setOf(LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark, HomeMarkDetail)
+        val routes = setOf(LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark, HomeMarkDetail, HomeFavorites)
     }
 }
 
@@ -106,6 +117,9 @@ fun TravelDiaryNavGraph(
 
     val markersVm = koinViewModel<MarkersViewModel>()
     val markersState by markersVm.state.collectAsStateWithLifecycle()
+
+    val favoritesVm = koinViewModel<FavoritesViewModel>()
+    val favoritesState by favoritesVm.state.collectAsStateWithLifecycle()
 
     val defaultLatitude by position.latitude.observeAsState()
     val defaultLongitude by position.longitude.observeAsState()
@@ -200,19 +214,41 @@ fun TravelDiaryNavGraph(
                 HomeMarksScreen(navController = navController, state = markersState, user = user)
             }
         }
+        with(TravelDiaryRoute.HomeFavorites) {
+            composable(route) {
+
+            }
+        }
         with(TravelDiaryRoute.HomeMarkDetail) {
             composable(route, arguments) {backStackEntry ->
                 val latitude = backStackEntry.arguments?.getFloat("latitude") ?: 0f
                 val longitude = backStackEntry.arguments?.getFloat("longitude") ?: 0f
-
                 val marker = requireNotNull(markersState.markers.find {
                     it.latitude == latitude && it.longitude == longitude
                 })
                 val user = requireNotNull(usersState.users.find {
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
+                val favorite = (favoritesState.favorites.find {
+                    it.userId == user.id && it.markerId == marker.id
+                })
 
-                HomeMarkDetailScreen(navController = navController, marker = marker, user = user)
+
+                HomeMarkDetailScreen(
+                    navController = navController,
+                    marker = marker,
+                    user = user,
+                    favorite = favorite != null,
+                    onFavorite = fun(userId :Int, markerId : Int) {
+                        favoritesVm.addFavorite(Favorite(userId, markerId))
+                    },
+                    onSFavorite = fun(userId :Int, markerId : Int) {
+                        val toDelete = requireNotNull(favoritesState.favorites.find {
+                            it.userId == userId && it.markerId == markerId
+                        })
+                        favoritesVm.deleteFavorite(toDelete)
+                    }
+                )
             }
         }
 

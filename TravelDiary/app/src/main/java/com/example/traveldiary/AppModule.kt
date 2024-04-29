@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.traveldiary.data.database.TravelDiaryDatabase
+import com.example.traveldiary.data.repositories.FavoritesRepository
 import com.example.traveldiary.data.repositories.MarkersRepository
 import com.example.traveldiary.data.repositories.UsersRepository
+import com.example.traveldiary.ui.FavoritesViewModel
 import com.example.traveldiary.ui.MarkersViewModel
 import com.example.traveldiary.ui.UsersViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
@@ -31,13 +33,17 @@ val appModule = module {
 
     single { MarkersRepository(get<TravelDiaryDatabase>().placesDAO()) }
 
+    single { FavoritesRepository(get<TravelDiaryDatabase>().placesDAO()) }
+
     viewModel { AddTravelViewModel() }
 
     viewModel { LoginViewModel() }
+
+    viewModel { AddMarkerViewModel() }
 
     viewModel { UsersViewModel(get()) }
 
     viewModel { MarkersViewModel(get()) }
 
-    viewModel { AddMarkerViewModel() }
+    viewModel { FavoritesViewModel(get())}
 }
