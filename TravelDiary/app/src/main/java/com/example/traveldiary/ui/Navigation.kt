@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.traveldiary.Position
 import com.example.traveldiary.data.database.Favorite
+import com.example.traveldiary.data.database.Marker
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.HomeAddMarkScreen
 import com.example.traveldiary.ui.screens.login.LogInScreen
@@ -63,7 +64,7 @@ sealed class TravelDiaryRoute(
 
     data object HomeFavorites : TravelDiaryRoute(
         "home/mark/favorite/{userUsername}",
-        "favorite marks",
+        "favoriteMarks",
         listOf(
             navArgument("userUsername") { type = NavType.StringType }
         )
@@ -207,7 +208,7 @@ fun TravelDiaryNavGraph(
             }
         }
         with(TravelDiaryRoute.HomeMarks) {
-            composable(route) {backStackEntry ->
+            composable(route, arguments) { backStackEntry ->
                 val user = requireNotNull(usersState.users.find {
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
@@ -215,8 +216,20 @@ fun TravelDiaryNavGraph(
             }
         }
         with(TravelDiaryRoute.HomeFavorites) {
-            composable(route) {
-
+            composable(route, arguments) {backStackEntry ->
+                val user = requireNotNull(usersState.users.find {
+                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                })
+                val listFavorite = favoritesState.favorites.filter { it.userId == user.id }
+                val listFavoriteMarker: MutableList<Marker> = mutableListOf()
+                listFavorite.forEach{fav ->
+                    listFavoriteMarker.add(requireNotNull(markersState.markers.find { fav.markerId == it.id }))
+                }
+                HomeMarksScreen(
+                    navController = navController,
+                    state = MarkersState(listFavoriteMarker),
+                    user = user
+                )
             }
         }
         with(TravelDiaryRoute.HomeMarkDetail) {

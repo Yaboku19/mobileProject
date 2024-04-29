@@ -172,10 +172,6 @@ fun NoItemsPlaceholder(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Text(
-            "Tap the + button to add a new place.",
-            style = MaterialTheme.typography.bodyLarge
-        )
     }
 }
 
@@ -271,8 +267,6 @@ private fun InnerAppBar(setCity : Set<String>, setProvince : Set<String>, onSubm
 
 @Composable
 private fun InnerMenu(expand : Boolean, onDismiss : () -> Unit, setItem : Set<String>, onSetItem : (String) -> Unit) {
-    println(expand)
-    println(".................................")
     DropdownMenu(
         expanded = expand,
         onDismissRequest = { onDismiss() }
