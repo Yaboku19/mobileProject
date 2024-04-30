@@ -6,9 +6,11 @@ import androidx.room.Room
 import com.example.traveldiary.data.database.TravelDiaryDatabase
 import com.example.traveldiary.data.repositories.FavoritesRepository
 import com.example.traveldiary.data.repositories.MarkersRepository
+import com.example.traveldiary.data.repositories.ThemeRepository
 import com.example.traveldiary.data.repositories.UsersRepository
 import com.example.traveldiary.ui.FavoritesViewModel
 import com.example.traveldiary.ui.MarkersViewModel
+import com.example.traveldiary.ui.ThemeViewModel
 import com.example.traveldiary.ui.UsersViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.login.LoginViewModel
@@ -35,6 +37,8 @@ val appModule = module {
 
     single { FavoritesRepository(get<TravelDiaryDatabase>().placesDAO()) }
 
+    single { ThemeRepository(get()) }
+
     viewModel { AddTravelViewModel() }
 
     viewModel { LoginViewModel() }
@@ -46,4 +50,6 @@ val appModule = module {
     viewModel { MarkersViewModel(get()) }
 
     viewModel { FavoritesViewModel(get())}
+
+    viewModel { ThemeViewModel(get()) }
 }

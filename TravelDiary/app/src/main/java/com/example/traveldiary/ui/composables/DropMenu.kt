@@ -88,8 +88,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             DropdownMenuItem(
                 onClick = {
                     showMenu = false
-                    // Aggiungi azione per "Opzione 2"
-                    println("Opzione 4 selezionata")
+                    navController.navigate(TravelDiaryRoute.HomeSettings.buildRoute(user.username))
                 },
                 text = { Text("Impostazioni") }
             )

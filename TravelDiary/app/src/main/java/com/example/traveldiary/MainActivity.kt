@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -29,8 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.traveldiary.data.models.Theme
+import com.example.traveldiary.ui.ThemeViewModel
 import com.example.traveldiary.ui.TravelDiaryNavGraph
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.AppBar
@@ -42,6 +46,7 @@ import com.example.traveldiary.utils.rememberPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
+import org.koin.androidx.compose.koinViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -54,25 +59,17 @@ class MainActivity : ComponentActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationService = LocationService(this)
 
-        /*val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                getLastLocation()
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Permesso negato una volta, mostrare spiegazione se necessario
-                    Toast.makeText(this, "Location permission is needed to provide functionality", Toast.LENGTH_LONG).show()
-
-                } else {
-                    // Permesso negato definitivamente
-                    Toast.makeText(this, "Permission was denied and cannot be asked again", Toast.LENGTH_LONG).show()
-                }
-            }
-        }*/
-
         setContent {
-            TravelDiaryTheme {
+            val themeViewModel = koinViewModel<ThemeViewModel>()
+            val themeState by themeViewModel.state.collectAsStateWithLifecycle()
+
+            TravelDiaryTheme (
+                darkTheme = when (themeState.theme) {
+                    Theme.Light -> false
+                    Theme.Dark -> true
+                    Theme.System -> isSystemInDarkTheme()
+                }
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -131,20 +128,9 @@ class MainActivity : ComponentActivity() {
                             navController,
                             modifier =  Modifier.padding(contentPadding),
                             position = position,
-                            onPosition = fun() {
-                                /*when (PackageManager.PERMISSION_GRANTED) {
-                                    ContextCompat.checkSelfPermission(
-                                        this, Manifest.permission.ACCESS_FINE_LOCATION
-                                    ) -> {
-                                        getLastLocation()
-
-                                    }
-                                    else -> {
-                                        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                    }
-                                }*/
-                                requestLocation()
-                            }
+                            onPosition = { requestLocation() },
+                            themeState = themeState,
+                            onThemeSelected = themeViewModel::changeTheme
                         )
                     }
                     if (showLocationDisabledAlert) {

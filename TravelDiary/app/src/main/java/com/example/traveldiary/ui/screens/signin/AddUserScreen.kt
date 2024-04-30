@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.UsersViewModel
 
 @Composable
@@ -77,7 +78,7 @@ fun AddUserScreen(
             if (addUserResult == false) {
                 Text(addUserLog.toString(), color = Color.Red)
             } else if (addUserResult == true) {
-                navController.navigateUp()
+                navController.navigate(TravelDiaryRoute.LogIn.route)
             }
         }
     }
