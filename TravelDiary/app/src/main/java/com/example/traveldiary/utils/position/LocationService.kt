@@ -1,4 +1,4 @@
-package com.example.traveldiary.utils
+package com.example.traveldiary.utils.position
 
 import android.Manifest
 import android.content.Context

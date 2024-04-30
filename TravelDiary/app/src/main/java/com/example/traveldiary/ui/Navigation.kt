@@ -28,6 +28,7 @@ import com.example.traveldiary.ui.screens.signin.AddTravelViewModel
 import com.example.traveldiary.ui.screens.login.LoginViewModel
 import com.example.traveldiary.ui.screens.homeMap.HomeMapScreen
 import com.example.traveldiary.ui.screens.homeMarks.HomeMarksScreen
+import com.example.traveldiary.ui.screens.homeProfile.HomeProfileScreen
 import com.example.traveldiary.ui.screens.homeSettings.HomeSettingsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -74,6 +75,16 @@ sealed class TravelDiaryRoute(
         fun buildRoute(userUsername: String) = "home/settings/$userUsername"
     }
 
+    data object HomeProfile : TravelDiaryRoute(
+        "home/profile/{userUsername}",
+        "Profile",
+        listOf(
+            navArgument("userUsername") { type = NavType.StringType }
+        )
+    ) {
+        fun buildRoute(userUsername: String) = "home/profile/$userUsername"
+    }
+
     data object HomeFavorites : TravelDiaryRoute(
         "home/mark/favorite/{userUsername}",
         "favoriteMarks",
@@ -113,7 +124,10 @@ sealed class TravelDiaryRoute(
     data object SignIn : TravelDiaryRoute("sign-in", "sign-in")
 
     companion object {
-        val routes = setOf(LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark, HomeMarkDetail, HomeFavorites)
+        val routes = setOf(
+            LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark,
+            HomeMarkDetail, HomeFavorites, HomeSettings, HomeProfile
+        )
     }
 }
 
@@ -125,7 +139,8 @@ fun TravelDiaryNavGraph(
     onPosition : () -> Unit,
     position: Position,
     themeState: ThemeState,
-    onThemeSelected: (Theme) -> Unit
+    onThemeSelected: (Theme) -> Unit,
+    onCamera: () -> Unit
 ) {
     val usersVm = koinViewModel<UsersViewModel>()
     val usersState by usersVm.state.collectAsStateWithLifecycle()
@@ -235,11 +250,19 @@ fun TravelDiaryNavGraph(
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
                 HomeSettingsScreen(
-                    navHostController = navController,
+                    navController = navController,
                     user = user,
                     state = themeState,
                     onThemeSelected = onThemeSelected
                     )
+            }
+        }
+        with(TravelDiaryRoute.HomeProfile) {
+            composable(route, arguments) { backStackEntry ->
+                val user = requireNotNull(usersState.users.find {
+                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                })
+                HomeProfileScreen(navController = navController, user = user, onCamera = onCamera)
             }
         }
         with(TravelDiaryRoute.HomeFavorites) {

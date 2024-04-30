@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -39,10 +40,11 @@ import com.example.traveldiary.ui.TravelDiaryNavGraph
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.AppBar
 import com.example.traveldiary.ui.theme.TravelDiaryTheme
-import com.example.traveldiary.utils.LocationService
-import com.example.traveldiary.utils.PermissionStatus
-import com.example.traveldiary.utils.StartMonitoringResult
-import com.example.traveldiary.utils.rememberPermission
+import com.example.traveldiary.utils.camera.rememberCameraLauncher
+import com.example.traveldiary.utils.position.LocationService
+import com.example.traveldiary.utils.position.PermissionStatus
+import com.example.traveldiary.utils.position.StartMonitoringResult
+import com.example.traveldiary.utils.position.rememberPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
@@ -118,6 +120,25 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    val ctx = LocalContext.current
+
+                    val cameraLauncher = rememberCameraLauncher()
+
+                    val cameraPermission = rememberPermission(Manifest.permission.CAMERA) { status ->
+                        if (status.isGranted) {
+                            cameraLauncher.captureImage()
+                        } else {
+                            Toast.makeText(ctx, "Permission denied", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    fun takePicture() =
+                        if (cameraPermission.status.isGranted) {
+                            cameraLauncher.captureImage()
+                        } else {
+                            cameraPermission.launchPermissionRequest()
+                        }
+
                     Scaffold(
                         topBar = { AppBar(navController, currentRoute) },
                         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -130,7 +151,8 @@ class MainActivity : ComponentActivity() {
                             position = position,
                             onPosition = { requestLocation() },
                             themeState = themeState,
-                            onThemeSelected = themeViewModel::changeTheme
+                            onThemeSelected = themeViewModel::changeTheme,
+                            onCamera = { takePicture() }
                         )
                     }
                     if (showLocationDisabledAlert) {
@@ -175,7 +197,6 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    val ctx = LocalContext.current
                     if (showPermissionPermanentlyDeniedSnackbar) {
                         LaunchedEffect(snackbarHostState) {
                             val res = snackbarHostState.showSnackbar(

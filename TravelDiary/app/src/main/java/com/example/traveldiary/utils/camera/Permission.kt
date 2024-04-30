@@ -1,4 +1,4 @@
-package com.example.traveldiary.utils
+package com.example.traveldiary.utils.camera
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
