@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -40,7 +39,6 @@ import com.example.traveldiary.ui.TravelDiaryNavGraph
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.AppBar
 import com.example.traveldiary.ui.theme.TravelDiaryTheme
-import com.example.traveldiary.utils.camera.rememberCameraLauncher
 import com.example.traveldiary.utils.position.LocationService
 import com.example.traveldiary.utils.position.PermissionStatus
 import com.example.traveldiary.utils.position.StartMonitoringResult
@@ -119,25 +117,7 @@ class MainActivity : ComponentActivity() {
                             } ?: TravelDiaryRoute.LogIn
                         }
                     }
-
                     val ctx = LocalContext.current
-
-                    val cameraLauncher = rememberCameraLauncher()
-
-                    val cameraPermission = rememberPermission(Manifest.permission.CAMERA) { status ->
-                        if (status.isGranted) {
-                            cameraLauncher.captureImage()
-                        } else {
-                            Toast.makeText(ctx, "Permission denied", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    fun takePicture() =
-                        if (cameraPermission.status.isGranted) {
-                            cameraLauncher.captureImage()
-                        } else {
-                            cameraPermission.launchPermissionRequest()
-                        }
 
                     Scaffold(
                         topBar = { AppBar(navController, currentRoute) },
@@ -152,8 +132,6 @@ class MainActivity : ComponentActivity() {
                             onPosition = { requestLocation() },
                             themeState = themeState,
                             onThemeSelected = themeViewModel::changeTheme,
-                            onCamera = { takePicture() },
-                            cameraLauncher = cameraLauncher
                         )
                     }
                     if (showLocationDisabledAlert) {
@@ -230,47 +208,15 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         locationService.resumeLocationRequest()
     }
-
-    /*private fun getLastLocation() {
-        when {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
-                // Permesso già concesso
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        position.setLatitude(location.latitude.toFloat())
-                        position.setLongitude(location.longitude.toFloat())
-                    } else {
-                        Toast.makeText(this, "No location found", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                // Permesso negato una volta, mostrare spiegazione se necessario
-                // e chiedere nuovamente il permesso
-                Toast.makeText(this, "Location permission is needed to provide functionality", Toast.LENGTH_LONG).show()
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
-            }
-            else -> {
-                // Permesso negato definitivamente (utente ha scelto "Don't ask again")
-                Toast.makeText(this, "Permission was denied and cannot be asked again", Toast.LENGTH_LONG).show()
-                // Qui potresti voler spiegare ulteriormente o aprire le impostazioni dell'app
-                // per permettere all'utente di cambiare manualmente i permessi se desidera
-            }
-        }
-    }
-
-    companion object {
-        private const val REQUEST_LOCATION_PERMISSION = 1
-    }*/
 }
 
 class Position (
     latitude : Float,
     longitude : Float
 ) {
-    private val _latitude = MutableLiveData<Float> (latitude)
+    private val _latitude = MutableLiveData(latitude)
     val latitude : LiveData<Float> = _latitude
-    private val _longitude = MutableLiveData<Float> (longitude)
+    private val _longitude = MutableLiveData(longitude)
     val longitude : LiveData<Float> = _longitude
 
     fun setLatitude(latitude: Float) {
