@@ -152,7 +152,8 @@ class MainActivity : ComponentActivity() {
                             onPosition = { requestLocation() },
                             themeState = themeState,
                             onThemeSelected = themeViewModel::changeTheme,
-                            onCamera = { takePicture() }
+                            onCamera = { takePicture() },
+                            cameraLauncher = cameraLauncher
                         )
                     }
                     if (showLocationDisabledAlert) {

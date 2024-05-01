@@ -14,6 +14,9 @@ data class User (
 
     @ColumnInfo
     var password: String,
+
+    @ColumnInfo
+    var urlProfilePicture : String
 )
 
 @Entity

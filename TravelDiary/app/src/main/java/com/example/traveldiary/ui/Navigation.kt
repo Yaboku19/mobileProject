@@ -30,6 +30,7 @@ import com.example.traveldiary.ui.screens.homeMap.HomeMapScreen
 import com.example.traveldiary.ui.screens.homeMarks.HomeMarksScreen
 import com.example.traveldiary.ui.screens.homeProfile.HomeProfileScreen
 import com.example.traveldiary.ui.screens.homeSettings.HomeSettingsScreen
+import com.example.traveldiary.utils.camera.CameraLauncher
 import org.koin.androidx.compose.koinViewModel
 
 sealed class TravelDiaryRoute(
@@ -140,7 +141,8 @@ fun TravelDiaryNavGraph(
     position: Position,
     themeState: ThemeState,
     onThemeSelected: (Theme) -> Unit,
-    onCamera: () -> Unit
+    onCamera: () -> Unit,
+    cameraLauncher: CameraLauncher
 ) {
     val usersVm = koinViewModel<UsersViewModel>()
     val usersState by usersVm.state.collectAsStateWithLifecycle()
@@ -262,7 +264,13 @@ fun TravelDiaryNavGraph(
                 val user = requireNotNull(usersState.users.find {
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
-                HomeProfileScreen(navController = navController, user = user, onCamera = onCamera)
+                HomeProfileScreen(
+                    navController = navController,
+                    user = user,
+                    onCamera = onCamera,
+                    cameraLauncher = cameraLauncher,
+                    onModify = usersVm::addUserWithoutControl
+                )
             }
         }
         with(TravelDiaryRoute.HomeFavorites) {

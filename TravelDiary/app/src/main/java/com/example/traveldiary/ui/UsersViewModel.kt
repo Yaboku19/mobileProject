@@ -47,6 +47,12 @@ class UsersViewModel(
         }
     }
 
+    fun addUserWithoutControl(user: User) {
+        viewModelScope.launch {
+            repository.upsert(user)
+        }
+    }
+
     fun login(user:User) {
         viewModelScope.launch {
             val userMatch = repository.getUser(user.username).firstOrNull()

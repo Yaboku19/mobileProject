@@ -14,7 +14,8 @@ data class AddUserState(
 
     fun toUser() = User(
         username = username,
-        password = password
+        password = password,
+        urlProfilePicture = "default.png"
     )
 }
 

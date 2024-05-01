@@ -39,7 +39,6 @@ fun HomeAddMarkScreen(
     user: User,
     onSubmit: () -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     var locationDetails by remember { mutableStateOf(false) }
 
     LaunchedEffect(latitude, longitude) {  // Assicurati di ricaricare i dati quando le coordinate cambiano
