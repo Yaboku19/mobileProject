@@ -44,7 +44,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top =
-                    if(currentRoute.title == "homePage" || currentRoute.title == "marks" || currentRoute.title == "favoriteMarks")
+                    if(currentRoute.title == "homePage" )
                         70.dp
                         else 16.dp,
                     start = 16.dp)  // Posizionamento in alto a destra
@@ -83,6 +83,13 @@ fun DropMenu(user: User, navController: NavHostController) {
                     navController.navigate(TravelDiaryRoute.HomeFavorites.buildRoute(user.username))
                 },
                 text = { Text("Preferiti") }
+            )
+            DropdownMenuItem(
+                onClick = {
+                    showMenu = false
+                    navController.navigate(TravelDiaryRoute.HomeStatistics.buildRoute(user.username))
+                },
+                text = { Text("Statistiche") }
             )
             DropdownMenuItem(
                 onClick = {

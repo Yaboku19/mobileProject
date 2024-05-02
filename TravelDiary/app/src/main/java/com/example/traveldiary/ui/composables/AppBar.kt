@@ -20,6 +20,7 @@ fun AppBar(
     navController: NavHostController,
     currentRoute: TravelDiaryRoute
 ) {
+
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -29,12 +30,23 @@ fun AppBar(
         },
         navigationIcon = {
             if (navController.previousBackStackEntry != null) {
-                IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back button"
-                    )
+                if (
+                    (
+                        navController.previousBackStackEntry?.destination?.route != "log-in"
+                        || currentRoute.title == "sign-in"
+                    ) && (
+                        currentRoute.title != "log-in"
+                    )) {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Back button"
+                        )
+                    }
                 }
+                println("route ")
+                println()
+
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

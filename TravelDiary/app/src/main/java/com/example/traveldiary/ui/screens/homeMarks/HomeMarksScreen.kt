@@ -105,8 +105,9 @@ fun HomeMarksScreen(navController: NavHostController, state : MarkersState, user
         } else {
             NoItemsPlaceholder(Modifier.padding(contentPadding))
         }
-        DropMenu(user = user, navController = navController)
+
     }
+    DropMenu(user = user, navController = navController)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

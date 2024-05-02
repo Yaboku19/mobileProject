@@ -17,13 +17,14 @@ import com.example.traveldiary.data.database.User
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import com.example.traveldiary.ui.composables.DropMenu
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun HomeSettingsScreen(
     navController: NavHostController,
     user: User,
     state: ThemeState,
-    onThemeSelected: (Theme) -> Unit
+    onThemeSelected: (Theme) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
 

@@ -1,5 +1,6 @@
 package com.example.traveldiary.ui
 
+import com.example.traveldiary.ui.screens.homeStatistics.HomeStatisticsScreen
 import com.example.traveldiary.ui.screens.homeMarkDetail.HomeMarkDetailScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -93,6 +94,16 @@ sealed class TravelDiaryRoute(
         fun buildRoute(userUsername: String) = "home/mark/favorite/$userUsername"
     }
 
+    data object HomeStatistics : TravelDiaryRoute(
+        "home/statistics/{userUsername}",
+        "Statistiche",
+        listOf(
+            navArgument("userUsername") { type = NavType.StringType }
+        )
+    ) {
+        fun buildRoute(userUsername: String) = "home/statistics/$userUsername"
+    }
+
     data object HomeAddMark : TravelDiaryRoute(
         "home/add/{userUsername}/{latitude}/{longitude}",
         "addMark",
@@ -124,7 +135,7 @@ sealed class TravelDiaryRoute(
     companion object {
         val routes = setOf(
             LogIn, HomeMap, SignIn, HomeMarks, HomeAddMark,
-            HomeMarkDetail, HomeFavorites, HomeSettings, HomeProfile
+            HomeMarkDetail, HomeFavorites, HomeSettings, HomeProfile, HomeStatistics
         )
     }
 }
@@ -239,6 +250,23 @@ fun TravelDiaryNavGraph(
                     it.username == backStackEntry.arguments?.getString("userUsername").toString()
                 })
                 HomeMarksScreen(navController = navController, state = markersState, user = user)
+            }
+        }
+        with(TravelDiaryRoute.HomeStatistics) {
+            composable(route, arguments) { backStackEntry ->
+                val user = requireNotNull(usersState.users.find {
+                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                })
+                val listFavorite = favoritesState.favorites.filter { it.userId == user.id }
+                val listFavoriteMarker: MutableList<Marker> = mutableListOf()
+                listFavorite.forEach{fav ->
+                    listFavoriteMarker.add(requireNotNull(markersState.markers.find { fav.markerId == it.id }))
+                }
+                HomeStatisticsScreen(
+                    navController = navController,
+                    markerState = markersState,
+                    user = user,
+                    favoriteState = MarkersState(listFavoriteMarker))
             }
         }
         with(TravelDiaryRoute.HomeSettings) {
