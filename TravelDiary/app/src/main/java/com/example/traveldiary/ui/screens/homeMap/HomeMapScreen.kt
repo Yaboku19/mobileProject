@@ -156,9 +156,11 @@ fun HomeMapScreen(
                     navController,
                     user)
             }
+
             if (showButton) {
                 FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = {
                         navController.navigate(TravelDiaryRoute.HomeAddMark.buildRoute(
                             user.username,
@@ -176,7 +178,8 @@ fun HomeMapScreen(
                 }
             }
             FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 onClick = {
                         onPosition()
                     },

@@ -40,7 +40,8 @@ fun DropMenu(user: User, navController: NavHostController) {
     Box() {
         FloatingActionButton(
             onClick = { showMenu = !showMenu },
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top =

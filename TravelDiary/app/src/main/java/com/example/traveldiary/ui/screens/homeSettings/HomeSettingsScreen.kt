@@ -59,7 +59,11 @@ fun ThemeSelector(
             modifier = Modifier.weight(1f)
         )
         Button(
-            onClick = { setShowMenu(!showMenu) }
+            onClick = { setShowMenu(!showMenu) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         ) {
             Text(text = "Change Theme")
         }
@@ -109,7 +113,11 @@ fun LogOutButton(navController: NavHostController) {
         horizontalArrangement = Arrangement.End
     ) {
         Button(
-            onClick = { navController.navigate(TravelDiaryRoute.LogIn.route) }
+            onClick = { navController.navigate(TravelDiaryRoute.LogIn.route) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         ) {
             Text(text = "Log Out")
         }

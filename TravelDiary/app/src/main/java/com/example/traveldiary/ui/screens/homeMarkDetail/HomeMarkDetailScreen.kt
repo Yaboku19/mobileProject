@@ -1,8 +1,10 @@
 package com.example.traveldiary.ui.screens.homeMarkDetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,8 +15,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,11 +53,13 @@ fun HomeMarkDetailScreen(
                 .padding(start = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.size(20.dp))
             Box(
                 contentAlignment = Alignment.TopStart,
                 modifier = Modifier
                     .padding(16.dp)
                     .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(8.dp)
             ) {
                 Column(
@@ -79,6 +85,7 @@ fun HomeMarkDetailScreen(
                 modifier = Modifier
                     .padding(16.dp)
                     .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(8.dp)
             ) {
                 Column(
@@ -99,15 +106,73 @@ fun HomeMarkDetailScreen(
                     )
                 }
             }
-            Button(onClick = {
-                navController.navigate(
-                    TravelDiaryRoute.HomeMap.buildRoute(
-                        user.username,
-                        marker.latitude,
-                        marker.longitude
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()  // Assicura che la Column occupi tutto lo spazio orizzontale del Box
+                ) {
+                    Text(
+                        text = "Città:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()  // Assicura che il Text occupi tutto lo spazio orizzontale della Column
+                            .wrapContentWidth(Alignment.CenterHorizontally)  // Centra il Text all'interno della sua area
                     )
+                    Text(
+                        text = marker.city,
+                        fontSize = 18.sp
+                        // Questo Text è allineato a sinistra per default
+                    )
+                }
+            }
+            Box(
+                contentAlignment = Alignment.TopStart,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()  // Assicura che la Column occupi tutto lo spazio orizzontale del Box
+                ) {
+                    Text(
+                        text = "Provincia:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()  // Assicura che il Text occupi tutto lo spazio orizzontale della Column
+                            .wrapContentWidth(Alignment.CenterHorizontally)  // Centra il Text all'interno della sua area
+                    )
+                    Text(
+                        text = marker.province,
+                        fontSize = 18.sp
+                        // Questo Text è allineato a sinistra per default
+                    )
+                }
+            }
+            Button(
+                onClick = {
+                    navController.navigate(
+                        TravelDiaryRoute.HomeMap.buildRoute(
+                            user.username,
+                            marker.latitude,
+                            marker.longitude
+                        )
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            }) {
+            ) {
                 Text(text = "Guarda posizione")
             }
 

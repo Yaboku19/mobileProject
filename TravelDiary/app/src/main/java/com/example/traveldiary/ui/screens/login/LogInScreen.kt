@@ -1,5 +1,6 @@
 package com.example.traveldiary.ui.screens.login
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.outlined.DoneOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,6 +64,10 @@ fun LogInScreen(
                 onSubmit()
             },
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         ) {
             Icon(
                 Icons.Outlined.DoneOutline,
@@ -77,7 +83,11 @@ fun LogInScreen(
                 navController.navigate(TravelDiaryRoute.SignIn.route)
             },
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier.align(Alignment.End),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         ) {
             Text("sign-in")
         }
