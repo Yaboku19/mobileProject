@@ -31,4 +31,5 @@ class FavoritesViewModel(
             repository.delete(favorite)
         }
     }
+
 }

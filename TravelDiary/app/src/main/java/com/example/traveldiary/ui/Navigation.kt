@@ -197,13 +197,21 @@ fun TravelDiaryNavGraph(
                 val user = requireNotNull(usersState.users.find {
                     it.username == userName
                 })
+                val listFavorite = favoritesState.favorites.filter { it.userId == user.id }
                 HomeMapScreen(
                     user,
                     navController,
                     markersState,
                     latitude!!,
                     longitude!!,
-                    onPosition = {onPosition()})
+                    onPosition = {onPosition()},
+                    isFavorite = fun(marker: Marker) : Boolean {
+                        val favorite = listFavorite.find{
+                            it.markerId == marker.id
+                        }
+                        return favorite != null
+                    }
+                )
             }
         }
         with(TravelDiaryRoute.SignIn) {
