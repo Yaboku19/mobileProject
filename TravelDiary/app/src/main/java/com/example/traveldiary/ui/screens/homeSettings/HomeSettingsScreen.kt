@@ -31,7 +31,7 @@ fun HomeSettingsScreen(
     Column(modifier = Modifier.padding(16.dp)) {
         LogOutButton(navController)
         Spacer(modifier = Modifier.height(10.dp))
-        ThemeSelector(state, showMenu, onThemeSelected, { showMenu = it })
+        ThemeSelector(state, showMenu, onThemeSelected) { showMenu = it }
     }
     DropMenu(user = user, navController = navController)
 }

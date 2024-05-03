@@ -1,7 +1,5 @@
 package com.example.traveldiary.ui.screens.homeMarks
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,7 +97,7 @@ fun HomeMarksScreen(navController: NavHostController, state : MarkersState, user
                 }
             }
         } else {
-            NoItemsPlaceholder(Modifier.padding(contentPadding))
+            NoItemsPlaceholder()
         }
 
     }
@@ -146,7 +144,7 @@ fun TravelItem(item: Marker, onClick: () -> Unit) {
 }
 
 @Composable
-fun NoItemsPlaceholder(modifier: Modifier) {
+fun NoItemsPlaceholder() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,

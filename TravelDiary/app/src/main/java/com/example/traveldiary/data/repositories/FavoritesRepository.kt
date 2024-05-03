@@ -11,5 +11,4 @@ class FavoritesRepository(private val placesDAO: PlacesDAO) {
 
     suspend fun delete(favorite: Favorite) = placesDAO.deleteFavorite(favorite)
 
-    fun getFavorite (userId : Int, markerId : Int) = placesDAO.getFavorite(userId, markerId)
 }

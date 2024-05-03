@@ -1,12 +1,8 @@
 package com.example.traveldiary.ui.screens.homeMap
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,15 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
-import com.example.traveldiary.Position
 import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.MarkersState
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.DropMenu
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -65,65 +57,6 @@ fun HomeMapScreen(
     longitude : Float,
     onPosition : () -> Unit
 ) {
-    /*val ctx = LocalContext.current
-
-    fun shareDetails() {
-        val sendIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, place.username)
-        }
-        val shareIntent = Intent.createChooser(sendIntent, "Share travel")
-        if (shareIntent.resolveActivity(ctx.packageManager) != null) {
-            ctx.startActivity(shareIntent)
-        }
-    }
-
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                onClick = ::shareDetails
-            ) {
-                Icon(Icons.Outlined.Share, "Share Travel")
-            }
-        },
-    ) { contentPadding ->
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(contentPadding).padding(12.dp).fillMaxSize()
-        ) {
-            Image(
-                Icons.Outlined.Image,
-                "Travel picture",
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSecondary),
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .size(128.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary)
-                    .padding(36.dp)
-            )
-            Text(
-                place.username,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                place.username,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.bodySmall
-            )
-            Spacer(Modifier.size(8.dp))
-            Text(
-                place.password,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }*/
     var center by remember { mutableStateOf(LatLng(latitude.toDouble(), longitude.toDouble())) }  // Coordinate iniziali di Roma
     var placeLocations by remember { mutableStateOf(listOf<LatLng>()) }
     val cameraPositionState = rememberCameraPositionState {
@@ -147,7 +80,7 @@ fun HomeMapScreen(
                         }
                     }
                 }
-                MapView(center, placeLocations, cameraPositionState, {
+                MapView(placeLocations, cameraPositionState, {
                     showButton = true
                 }, updateMarkerPosition = {
                     markerPosition = it
@@ -200,7 +133,6 @@ fun HomeMapScreen(
 
 @Composable
 fun MapView(
-    center: LatLng,
     placeLocations: List<LatLng>,
     cameraPositionState: CameraPositionState,
     onMarkerClick: () -> Unit,

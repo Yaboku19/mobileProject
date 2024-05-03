@@ -20,7 +20,6 @@ import androidx.navigation.navArgument
 import com.example.traveldiary.Position
 import com.example.traveldiary.data.database.Favorite
 import com.example.traveldiary.data.database.Marker
-import com.example.traveldiary.data.database.User
 import com.example.traveldiary.data.models.Theme
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.HomeAddMarkScreen

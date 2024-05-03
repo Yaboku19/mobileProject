@@ -1,7 +1,6 @@
 package com.example.traveldiary.ui.screens.signin
 
 import androidx.lifecycle.ViewModel
-import com.example.traveldiary.data.database.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,13 +11,6 @@ data class AddUserState(
     val salt: ByteArray = ByteArray(800)
 ) {
     val canSubmit get() = username.isNotBlank() && password.isNotBlank()
-
-    fun toUser() = User(
-        username = username,
-        password = password,
-        urlProfilePicture = "default.png",
-        salt = salt
-    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -37,7 +37,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             } ?: TravelDiaryRoute.LogIn
         }
     }
-    Box() {
+    Box {
         FloatingActionButton(
             onClick = { showMenu = !showMenu },
             containerColor = MaterialTheme.colorScheme.primaryContainer,

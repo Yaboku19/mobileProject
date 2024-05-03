@@ -1,6 +1,5 @@
 package com.example.traveldiary.ui.screens.homeStatistics
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -83,7 +82,7 @@ fun prepareChartData(state: MarkersState, isCity: Boolean): Pair<Map<String, Int
 
     state.markers.forEach { marker ->
         val key = if (isCity) marker.city else marker.province
-        key?.let {
+        key.let {
             labelMap[it] = labelMap.getOrDefault(it, 0) + 1
             if (!labels.contains(it)) labels.add(it)
         }
