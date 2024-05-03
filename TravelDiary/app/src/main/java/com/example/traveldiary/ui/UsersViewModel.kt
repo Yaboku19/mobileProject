@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
+import java.security.SecureRandom
 
 data class UsersState(val users: List<User>)
 
@@ -57,7 +59,7 @@ class UsersViewModel(
         viewModelScope.launch {
             val userMatch = repository.getUser(user.username).firstOrNull()
             if (userMatch != null ) {
-                _loginResult.value = userMatch.password == user.password
+                _loginResult.value = userMatch.password == hashPassword(user.password, userMatch.salt)
                 _loginLog.value = if (_loginResult.value!!) "" else "errore: Password sbagliata"
             } else {
                 _loginResult.value = false
@@ -74,5 +76,17 @@ class UsersViewModel(
 
     fun deleteUser(user: User) = viewModelScope.launch {
         repository.delete(user)
+    }
+
+    fun hashPassword(password: String, salt: ByteArray): String {
+        val bytes = password.toByteArray() + salt
+        val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
+    }
+    fun generateSalt(length: Int = 16): ByteArray {
+        val salt = ByteArray(length)
+        val random = SecureRandom()
+        random.nextBytes(salt)
+        return salt
     }
 }

@@ -215,7 +215,7 @@ fun TravelDiaryNavGraph(
                 AddUserScreen(
                     state = addUserState,
                     actions = addUserVm.actions,
-                    onSubmit = { usersVm.addUser(addUserState.toUser()) },
+                    onSubmit = { usersVm.addUser(it) },
                     navController = navController,
                     usersVm
                 )
@@ -296,7 +296,8 @@ fun TravelDiaryNavGraph(
                     user = user,
                     onModify = usersVm::addUserWithoutControl,
                     state = homeProfileState,
-                    actions = homeProfileVm.actions
+                    actions = homeProfileVm.actions,
+                    viewModel = usersVm
                 )
             }
         }

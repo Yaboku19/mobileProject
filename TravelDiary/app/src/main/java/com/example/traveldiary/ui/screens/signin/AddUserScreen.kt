@@ -25,14 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.UsersViewModel
+import java.security.SecureRandom
 
 @Composable
 fun AddUserScreen(
     state: AddUserState,
     actions: AddUserActions,
-    onSubmit: () -> Unit,
+    onSubmit: (User) -> Unit,
     navController: NavHostController,
     viewModel: UsersViewModel
 ) {
@@ -65,7 +67,11 @@ fun AddUserScreen(
             Button(
                 onClick = {
                     if (!state.canSubmit) return@Button
-                    onSubmit()
+                    val random = SecureRandom()
+                    val num = random.nextInt() % 18
+                    val salt = viewModel.generateSalt(num)
+                    val password = viewModel.hashPassword(state.password, salt)
+                    onSubmit(User(username = state.username, password = password, salt = salt, urlProfilePicture = "default.png"))
                 },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
                 colors = ButtonDefaults.buttonColors(

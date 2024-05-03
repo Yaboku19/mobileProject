@@ -30,6 +30,7 @@ import coil.compose.AsyncImage
 import com.example.traveldiary.R
 import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.TravelDiaryRoute
+import com.example.traveldiary.ui.UsersViewModel
 import com.example.traveldiary.ui.composables.DropMenu
 import com.example.traveldiary.utils.camera.rememberCameraLauncher
 import com.example.traveldiary.utils.position.rememberPermission
@@ -40,7 +41,8 @@ fun HomeProfileScreen(
     user: User,
     onModify: (User) -> Unit,
     state: HomeProfileState,
-    actions: HomeProfileActions
+    actions: HomeProfileActions,
+    viewModel : UsersViewModel
 ) {
     val ctx = LocalContext.current
 
@@ -110,7 +112,7 @@ fun HomeProfileScreen(
             Button(
                 onClick = {
                     if (!state.canSubmitUser) return@Button
-                    onModify(User(user.id, state.username, user.password, user.urlProfilePicture))
+                    onModify(User(user.id, state.username, user.password, user.urlProfilePicture, user.salt))
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -136,7 +138,9 @@ fun HomeProfileScreen(
             Button(
                 onClick = {
                     if (!state.canSubmitPassword) return@Button
-                    onModify(User(user.id, user.username, state.password, user.urlProfilePicture))
+                    val salt = viewModel.generateSalt()
+                    val password = viewModel.hashPassword(state.password, salt)
+                    onModify(User(user.id, user.username, password, user.urlProfilePicture, salt))
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -153,7 +157,7 @@ fun HomeProfileScreen(
 
     // Update the user's profile picture if a new picture is taken
     if (cameraLauncher.capturedImageUri.path?.isNotEmpty() == true) {
-        onModify(User(user.id, user.username, user.password, cameraLauncher.capturedImageUri.toString()))
+        onModify(User(user.id, user.username, user.password, cameraLauncher.capturedImageUri.toString(), user.salt))
     }
     DropMenu(user = user, navController = navController)
 }
