@@ -1,6 +1,5 @@
 package com.example.traveldiary.ui.screens.signin
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +27,6 @@ import androidx.navigation.NavHostController
 import com.example.traveldiary.data.database.User
 import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.UsersViewModel
-import java.security.SecureRandom
 
 @Composable
 fun AddUserScreen(
@@ -67,9 +65,7 @@ fun AddUserScreen(
             Button(
                 onClick = {
                     if (!state.canSubmit) return@Button
-                    val random = SecureRandom()
-                    val num = random.nextInt() % 18
-                    val salt = viewModel.generateSalt(num)
+                    val salt = viewModel.generateSalt()
                     val password = viewModel.hashPassword(state.password, salt)
                     onSubmit(User(username = state.username, password = password, salt = salt, urlProfilePicture = "default.png"))
                 },

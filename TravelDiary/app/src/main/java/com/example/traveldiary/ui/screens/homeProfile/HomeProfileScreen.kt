@@ -29,7 +29,6 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.traveldiary.R
 import com.example.traveldiary.data.database.User
-import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.UsersViewModel
 import com.example.traveldiary.ui.composables.DropMenu
 import com.example.traveldiary.utils.camera.rememberCameraLauncher
