@@ -3,15 +3,19 @@ package com.example.traveldiary.ui.screens.homeProfile
 import android.Manifest
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +29,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.traveldiary.R
 import com.example.traveldiary.data.database.User
+import com.example.traveldiary.ui.TravelDiaryRoute
 import com.example.traveldiary.ui.composables.DropMenu
 import com.example.traveldiary.utils.camera.rememberCameraLauncher
 import com.example.traveldiary.utils.position.rememberPermission
@@ -33,7 +38,9 @@ import com.example.traveldiary.utils.position.rememberPermission
 fun HomeProfileScreen(
     navController: NavHostController,
     user: User,
-    onModify: (User) -> Unit
+    onModify: (User) -> Unit,
+    state: HomeProfileState,
+    actions: HomeProfileActions
 ) {
     val ctx = LocalContext.current
 
@@ -65,7 +72,8 @@ fun HomeProfileScreen(
             Image(
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = "Profile Picture",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
                     .size(200.dp)  // Adjust the size to be about 1/4th and manageable
                     .clip(CircleShape)  // Apply a circular clip to the image
             )
@@ -86,8 +94,60 @@ fun HomeProfileScreen(
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         ) {
-            Text("Take a Picture")
+            Text("Fai una foto")
         }
+        Spacer(modifier = Modifier.height(15.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = state.username,
+                onValueChange = actions::setUsername,
+                label = { Text("Username") },
+                modifier = Modifier.weight(1f)
+            )
+            Button(
+                onClick = {
+                    if (!state.canSubmitUser) return@Button
+                    onModify(User(user.id, state.username, user.password, user.urlProfilePicture))
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically)
+            ) {
+                Text(text = "Cambia Username")
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Start)
+        ) {
+            OutlinedTextField(
+                value = state.password,
+                onValueChange = actions::setPassword,
+                label = { Text("Password") },
+                modifier = Modifier.weight(1f)
+            )
+            Button(
+                onClick = {
+                    if (!state.canSubmitPassword) return@Button
+                    onModify(User(user.id, user.username, state.password, user.urlProfilePicture))
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.padding(start = 8.dp).align(Alignment.CenterVertically)
+            ) {
+                Text(text = "Cambia Password")
+            }
+        }
+
 
     }
 

@@ -171,7 +171,7 @@ fun HomeMapScreen(
                         .align(Alignment.BottomStart)
                         .padding(start = 16.dp, bottom = 32.dp)
                 ) {
-                    Row {
+                    Row (modifier = Modifier.padding(8.dp)){
                         Icon(Icons.Outlined.Add, "Share Travel")
                         Text(text = "Aggiungi location")
                     }
@@ -187,7 +187,10 @@ fun HomeMapScreen(
                     .align(Alignment.TopEnd)
                     .padding(end = 16.dp, top = 70.dp)
             ) {
-                Text(text = "Usa la tua posizione")
+                Text(
+                    text = "Usa la tua posizione",
+                    modifier = Modifier.padding(8.dp)
+                )
             }
             DropMenu(user = user, navController = navController)
         }

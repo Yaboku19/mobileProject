@@ -13,6 +13,7 @@ import com.example.traveldiary.ui.MarkersViewModel
 import com.example.traveldiary.ui.ThemeViewModel
 import com.example.traveldiary.ui.UsersViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
+import com.example.traveldiary.ui.screens.homeProfile.HomeProfileViewModel
 import com.example.traveldiary.ui.screens.login.LoginViewModel
 import com.example.traveldiary.ui.screens.signin.AddTravelViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -44,6 +45,8 @@ val appModule = module {
     viewModel { LoginViewModel() }
 
     viewModel { AddMarkerViewModel() }
+
+    viewModel { HomeProfileViewModel() }
 
     viewModel { UsersViewModel(get()) }
 

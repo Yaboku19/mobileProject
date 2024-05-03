@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.example.traveldiary.Position
 import com.example.traveldiary.data.database.Favorite
 import com.example.traveldiary.data.database.Marker
+import com.example.traveldiary.data.database.User
 import com.example.traveldiary.data.models.Theme
 import com.example.traveldiary.ui.screens.homeAddMark.AddMarkerViewModel
 import com.example.traveldiary.ui.screens.homeAddMark.HomeAddMarkScreen
@@ -30,6 +31,7 @@ import com.example.traveldiary.ui.screens.login.LoginViewModel
 import com.example.traveldiary.ui.screens.homeMap.HomeMapScreen
 import com.example.traveldiary.ui.screens.homeMarks.HomeMarksScreen
 import com.example.traveldiary.ui.screens.homeProfile.HomeProfileScreen
+import com.example.traveldiary.ui.screens.homeProfile.HomeProfileViewModel
 import com.example.traveldiary.ui.screens.homeSettings.HomeSettingsScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,13 +77,13 @@ sealed class TravelDiaryRoute(
     }
 
     data object HomeProfile : TravelDiaryRoute(
-        "home/profile/{userUsername}",
+        "home/profile/{userId}",
         "Profile",
         listOf(
-            navArgument("userUsername") { type = NavType.StringType }
+            navArgument("userId") { type = NavType.StringType }
         )
     ) {
-        fun buildRoute(userUsername: String) = "home/profile/$userUsername"
+        fun buildRoute(userId: String) = "home/profile/$userId"
     }
 
     data object HomeFavorites : TravelDiaryRoute(
@@ -284,13 +286,17 @@ fun TravelDiaryNavGraph(
         }
         with(TravelDiaryRoute.HomeProfile) {
             composable(route, arguments) { backStackEntry ->
+                val homeProfileVm = koinViewModel<HomeProfileViewModel>()
+                val homeProfileState by homeProfileVm.state.collectAsStateWithLifecycle()
                 val user = requireNotNull(usersState.users.find {
-                    it.username == backStackEntry.arguments?.getString("userUsername").toString()
+                    it.id == backStackEntry.arguments?.getString("userId")!!.toInt()
                 })
                 HomeProfileScreen(
                     navController = navController,
                     user = user,
-                    onModify = usersVm::addUserWithoutControl
+                    onModify = usersVm::addUserWithoutControl,
+                    state = homeProfileState,
+                    actions = homeProfileVm.actions
                 )
             }
         }

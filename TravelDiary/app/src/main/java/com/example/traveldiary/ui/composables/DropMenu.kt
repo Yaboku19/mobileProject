@@ -59,7 +59,7 @@ fun DropMenu(user: User, navController: NavHostController) {
             DropdownMenuItem(
                 onClick = {
                     showMenu = false
-                    navController.navigate(TravelDiaryRoute.HomeProfile.buildRoute(user.username))
+                    navController.navigate(TravelDiaryRoute.HomeProfile.buildRoute(user.id.toString()))
                 },
                 text = { Text("Profilo") }
             )
